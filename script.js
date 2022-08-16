@@ -4,29 +4,33 @@ let display = document.querySelector(".display-2");
 buttons.forEach(button => button.addEventListener("click", e => {
     let buttonContent = button.textContent;
     let displayContent = display.textContent;
-    if (!button.classList.contains("operator")) {
-        displayNumber(button);
-    }
-    else if (buttonContent == "AC") {
-        reset();
-    }
-    else if (buttonContent == "DEL") {
-        if (displayContent.length == 1 || displayContent.length == "0"){
-            reset();
-        }
-        else {
-            displayContent = displayContent.slice(0, displayContent.length - 1);
-            display.textContent = displayContent;
-        }
-    }
-    else if (buttonContent == ".") {
-        float();
-    }
-    else if (buttonContent == "+/-") {
-        inverseSign();
-    }
+    if (!button.classList.contains("operator")) displayNumber(button);
     else {
-        getSecondOperand();
+        switch (buttonContent) {
+            case "AC" : 
+                reset(); 
+                break;
+            case "DEL":
+                if (displayContent.length == 1 || displayContent.length == "0"){
+                    reset();
+                }
+                else {
+                    displayContent = displayContent.slice(0, displayContent.length - 1);
+                    display.textContent = displayContent;
+                }
+                break;
+            case "." : 
+                float();
+                break;
+            case "+/-" : 
+                inverseSign();
+                break;
+            case "%" : 
+                percentage();
+                break;
+            default :
+                getOperand(button);
+        }
     }
 }))
 
@@ -57,6 +61,8 @@ function float() {
     else if (display.classList.contains("hasContent") && display.classList.contains("isFloat")) {
         return;
     }
+
+    //add % button function
     else {
         display.textContent += ".";
         display.classList.add("isFloat");
@@ -66,4 +72,19 @@ function float() {
 function inverseSign() {
     let n = Number(display.textContent);
     display.textContent = String((-n));
+}
+
+function percentage() {
+    let n = Number(display.textContent) / 100;
+    display.textContent = n;
+}
+
+function getOperand(button) {
+    let operand1 = display.textContent;
+    if (!display.hasAttribute("key-operator")) {
+        display.setAttribute("key-operator", `${ => operand1}`);
+            // + (button.textContent == "x") ? "*" : button.textContent;
+
+        reset();
+    }
 }
