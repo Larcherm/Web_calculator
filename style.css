@@ -23,7 +23,6 @@ body {
     flex: 1;
     display: flex;
     background-color: rgb(230, 230, 230);
-    border: 2px solid black;
     padding: 16px;
 }
 
@@ -40,6 +39,7 @@ body {
 .button-row {
     flex: 1;
     display: flex;
+    background-color: rgb(230, 230, 230);
 }
 
 .btn {
@@ -48,4 +48,26 @@ body {
     font-size: 24px;
     border-radius: 10px;
     margin: 3px;
+    transition: all 0.04s;
+}
+
+.sky {
+    background-color: lightskyblue;
+}
+
+.deletion {
+    background-color: lightcoral;
+}
+
+.oran {
+    background-color: lightsalmon;
+}
+
+.green {
+    background-color: lightslategray;
+}
+
+.pressed {
+    transform: scale(0.8);
+    box-shadow: 0 0 5px;
 }

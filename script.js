@@ -4,6 +4,7 @@ let display = document.querySelector(".display-2");
 buttons.forEach(button => button.addEventListener("click", e => {
     let buttonContent = button.textContent;
     let displayContent = display.textContent;
+    button.classList.add("pressed");
     if (!button.classList.contains("operator")) displayNumber(button);
     else {
         switch (buttonContent) {
@@ -33,23 +34,50 @@ buttons.forEach(button => button.addEventListener("click", e => {
         }
     }
 }))
+buttons.forEach(button => button.addEventListener("transitionend", e => {
+    if (e.propertyName !== "transform") return;
+    button.classList.remove("pressed");
+}))
+
+window.addEventListener("keydown", e => {
+    console.log(this);
+    console.log(e);
+})
 
 function displayNumber(button) {
+    let digitCount = display.textContent.length;
     if (display.classList.contains("hasContent")) {
-        display.textContent += button.textContent;
+        if (digitCount >= 21) return;
+        else if (display.textContent == "0") {
+            display.textContent = button.textContent;
+            digitCount = 1;
+        } else {
+            display.textContent += button.textContent;
+            digitCount++;
+        };
     }
     else {
-        if (button.textContent == "0") return;
         display.textContent = button.textContent;
         display.classList.add("hasContent");
+        digitCount++;
     }
     return;
 }
 
-function reset() {
-    display.textContent = "0";
+function reset(x = 0) {
     display.classList.remove("hasContent");
     display.classList.remove("isFloat");
+    charCount = 0;
+    if (x == 0) {
+        display.removeAttribute("key-operation");
+        display.textContent = "0";
+    }
+    else if (x == 1) {
+        display.removeAttribute("key-operation");
+    }
+    else {
+        return;
+    }
 }
 
 function float() {   
@@ -62,7 +90,6 @@ function float() {
         return;
     }
 
-    //add % button function
     else {
         display.textContent += ".";
         display.classList.add("isFloat");
@@ -76,15 +103,56 @@ function inverseSign() {
 
 function percentage() {
     let n = Number(display.textContent) / 100;
-    display.textContent = n;
+    display.textContent = limit(n);
 }
 
 function getOperand(button) {
-    let operand1 = display.textContent;
-    if (!display.hasAttribute("key-operator")) {
-        display.setAttribute("key-operator", `${ => operand1}`);
-            // + (button.textContent == "x") ? "*" : button.textContent;
+    let operand = display.textContent;
+    let operator = (button.textContent == "x") ? "*" : button.textContent;
+    if (!display.hasAttribute("key-operation")) {
+        if (operator == "=") return;
+        display.setAttribute("key-operation", `${operand + " " + operator}`);
+    }
+    else {
+        let opArray = display.getAttribute("key-operation").split(" ")
+        let result = operate(opArray[0], opArray[1], operand);
+        console.log(opArray);
+        if (operator == "=") {
+            display.textContent = result;
+            reset(1);
+            return;
+        }
+        else {
+            display.textContent = result;
+            display.setAttribute("key-operation", `${result + " " + operator}`);          
+        }
+    }
+    reset(2);
+}
 
-        reset();
+function operate(a, operator, b) {
+    a = Number(a);
+    b = Number(b);
+    switch (operator) {
+        case "*" :
+            return limit(a * b);
+        case "+" :
+            return limit(a + b);
+        case "-" :
+            return limit(a - b);
+        case "/" :
+            if (b == 0) return "ya broke it";
+            return limit(a / b);
     }
 }
+
+function limit(result) {
+    let length = String(result).length;
+    if (length <= 21 ) {
+        return result;
+    }
+    else {
+        return Math.round(result * 1e-21) / 1e-21;
+    }
+}
+
